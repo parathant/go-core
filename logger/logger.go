@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"time"
+	_ "time/tzdata"
 )
 
 var l *logrus.Entry
@@ -20,7 +21,10 @@ func init() {
 // New returns a logrus o*log. Entry with the givenn fields and formatter
 func New(fields logrus.Fields, level logrus.Level) *logrus.Entry {
 	if l == nil {
-		location, _ := time.LoadLocation("America/New_York")
+		location, err := time.LoadLocation("America/New_York")
+		if err != nil {
+			panic(err)
+		}
 		lg := logrus.StandardLogger()
 		lg.SetFormatter(&logrus.JSONFormatter{DisableTimestamp: true})
 		lg.SetOutput(os.Stdout)
@@ -44,15 +48,15 @@ func From(ctx context.Context) *logrus.Entry {
 	if l == nil {
 		l = New(logrus.Fields{}, logrus.InfoLevel)
 	}
-	return l
+	return l.WithContext(ctx)
 }
 
 // With returns a context with the added logrus.Entry
-func With(ct context.Context, logger *logrus.Entry) context.Context {
+func With(ctx context.Context, logger *logrus.Entry) context.Context {
 	if l == nil {
 		l = New(logrus.Fields{}, logrus.InfoLevel)
 	}
-	return context.WithValue(ct, ctKey{}, logger)
+	return context.WithValue(ctx, ctKey{}, logger)
 }
 
 // WithFormatter returns a logrus object (newLogger) with the added formatter
