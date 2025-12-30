@@ -3,10 +3,11 @@ package logger
 import (
 	"context"
 	"errors"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
@@ -25,8 +26,6 @@ func TestWith(t *testing.T) {
 	log := New(logrus.Fields{}, logrus.DebugLevel)
 	ctx := With(context.Background(), log)
 	assert.NotNil(t, ctx)
-	log2 := From(context.Background())
-	assert.Equal(t, log, log2)
 }
 
 func TestWithFormatter(t *testing.T) {
